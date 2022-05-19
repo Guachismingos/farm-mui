@@ -11,6 +11,7 @@ export const SaleProvider = ({ children }) => {
   const [total, setTotal] = useState(0);
   const [client, setClient] = useState(null);
   const [payWith, setPayWith] = useState(1);
+  const [credit, setCredit] = useState(false);
   const [payAmount, setPayAmount] = useState(0);
 
   const handleChangeQuantity = ({ target: { name, value } }) => {
@@ -27,7 +28,14 @@ export const SaleProvider = ({ children }) => {
     });
   };
 
-  const handleChangeAmout = ({ target: { name, value } }) => {};
+  const handleResetData = () => {
+    setSelectedProducts({});
+    setTotal(0);
+    setClient(null);
+    setPayWith(1);
+    setCredit(false);
+    setPayAmount(0);
+  };
 
   const value = {
     client,
@@ -39,6 +47,11 @@ export const SaleProvider = ({ children }) => {
     handleChangeQuantity,
     payWith,
     setPayWith,
+    payAmount,
+    credit,
+    setCredit,
+    setPayAmount,
+    handleResetData,
   };
 
   useEffect(() => {

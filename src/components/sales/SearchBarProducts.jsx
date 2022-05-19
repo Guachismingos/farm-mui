@@ -9,7 +9,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useSale } from "../../context/saleContext";
 
-const SearchBarProducts = ({product, setProduct}) => {
+const SearchBarProducts = ({ product, setProduct }) => {
   const { selectedProducts } = useSale();
   const { onGetData } = useAuth();
   const [open, setOpen] = useState(false);
@@ -18,16 +18,16 @@ const SearchBarProducts = ({product, setProduct}) => {
   const loading = open && options.length === 0;
 
   const handleOnChange = (_, value) => {
-    if(value){
+    if (value) {
       setProduct({
         ...value,
         quantity: 1,
         total: value.price,
       });
-    }else{
+    } else {
       setProduct(null);
     }
-  }
+  };
 
   useEffect(() => {
     let active = true;
@@ -40,7 +40,7 @@ const SearchBarProducts = ({product, setProduct}) => {
         onGetData("products", (querySnapshot) => {
           const docs = [];
           querySnapshot.forEach((doc) => {
-            if(!Object.keys(selectedProducts).includes(doc.id)){
+            if (!Object.keys(selectedProducts).includes(doc.id)) {
               docs.push({ ...doc.data(), id: doc.id });
             }
           });

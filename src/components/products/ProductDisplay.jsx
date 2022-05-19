@@ -95,7 +95,7 @@ const ProductDisplay = () => {
     <Container
       maxWidth={false}
       sx={{
-        pt: "85px",
+        pt: "50px",
         px: 0,
         height: "100%",
         position: "fixed",
@@ -107,7 +107,7 @@ const ProductDisplay = () => {
         maxWidth="sm"
         sx={{ textAlign: "center", pb: 10 }}
       >
-        <Typography variant="h4" sx={{ mb: "80px" }}>
+        <Typography variant="h4" sx={{ mb: "40px" }}>
           Información del Producto
         </Typography>
         <Stack gap={0} sx={{ pt: 1, textAlign: "left" }}>
@@ -116,6 +116,7 @@ const ProductDisplay = () => {
               <Grid item xs={12}>
                 <Collapse in={!!error.error} sx={{ width: "100%" }}>
                   <Alert
+                    variant="filled"
                     severity={error.type}
                     action={
                       <IconButton
@@ -278,6 +279,7 @@ const ProductDisplay = () => {
         onClose={() => setShowSnack(false)}
       >
         <Alert
+          variant="filled"
           severity="success"
           onClose={() => setShowSnack(false)}
           sx={{ width: "250px" }}

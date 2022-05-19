@@ -48,7 +48,7 @@ const Panel = () => {
     <Container
       maxWidth={false}
       sx={{
-        pt: "85px",
+        pt: "50px",
         px: 0,
         height: "100%",
         position: "fixed",
@@ -60,7 +60,7 @@ const Panel = () => {
         maxWidth="sm"
         sx={{ textAlign: "center" }}
       >
-        <Typography variant="h4" sx={{ mb: "80px" }}>
+        <Typography variant="h4" sx={{ mb: "40px" }}>
           Panel de Control
         </Typography>
         <Grid sx={{ pb: 10 }} container spacing={3}>

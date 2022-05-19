@@ -48,7 +48,6 @@ const SearchBarClients = (props) => {
       onClose={() => {
         setOpen(false);
       }}
-      groupBy={({ type }) => (type === 1 ? "Físico" : "Jurídico")}
       isOptionEqualToValue={(option, value) =>
         option.phone === `${value.phone}`
       }

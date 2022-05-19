@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import NewProduct from "../components/products/NewProduct";
 import ProductsTable from "../components/products/ProductsTable";
 import { useAuth } from "../context/AuthContext";
@@ -42,7 +42,7 @@ const Products = () => {
     <Container
       maxWidth={false}
       sx={{
-        pt: "85px",
+        pt: "50px",
         px: 0,
         height: "100%",
         position: "fixed",
@@ -55,7 +55,7 @@ const Products = () => {
         sx={{ textAlign: "center", pb: 10 }}
       >
         <Badge badgeContent={products.length} color="secondary">
-          <Typography variant="h4" sx={{ mb: "80px" }}>
+          <Typography variant="h4" sx={{ mb: "40px" }}>
             Productos
           </Typography>
         </Badge>
@@ -83,11 +83,11 @@ const Products = () => {
                   fullWidth
                   onChange={(event) => setSearchValue(event.target.value)}
                 />
-                <Divider sx={{ pt: "10px" }}>lista de productos</Divider>
+                <Divider sx={{ pt: "10px" }}>Lista de productos</Divider>
                 <ProductsTable products={products} searchValue={searchValue} />
               </Box>
             ) : (
-              <Alert severity="warning" sx={{ py: 3 }}>
+              <Alert variant="filled" severity="warning" sx={{ py: 3 }}>
                 Aun no se han ingresado clientes.
               </Alert>
             )
@@ -109,6 +109,7 @@ const Products = () => {
         onClose={() => setShowSnack(false)}
       >
         <Alert
+          variant="filled"
           severity="success"
           onClose={() => setShowSnack(false)}
           sx={{ width: "250px" }}

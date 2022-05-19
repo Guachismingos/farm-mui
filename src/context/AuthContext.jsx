@@ -48,13 +48,28 @@ export const AuthProvider = ({ children }) => {
   const deleteClientById = (idRef) => deleteDoc(doc(db, "clients", idRef));
 
   //Sales CRUD
-  const saveSale = (name, type, phone, address) =>
+  const saveSale = (
+    clientData,
+    products,
+    total,
+    credit,
+    payAmount,
+    payArray
+  ) => {
+    const timeElapsed = Date.now();
+    const today = new Date(timeElapsed);
     setDoc(doc(collection(db, "sales")), {
-      name,
-      type,
-      phone,
-      address,
+      clientData,
+      products,
+      total,
+      credit,
+      payAmount,
+      date: today.toLocaleDateString("es-CR"),
+      payArray,
     });
+  };
+
+  const getSaleById = (idRef) => getDoc(doc(db, "sales", idRef));
 
   //Products CRUD
   const saveProduct = (description, price) =>
@@ -94,6 +109,8 @@ export const AuthProvider = ({ children }) => {
     saveProductById,
     getProductbyId,
     deleteProductById,
+    saveSale,
+    getSaleById,
   };
 
   return (

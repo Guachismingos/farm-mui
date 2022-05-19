@@ -20,7 +20,11 @@ const ProductsTable = ({ products, searchValue }) => {
   const navigate = useNavigate();
 
   const searchResult = products.filter((product) => {
-    const clientValues = (product.description + product.price).toLowerCase();
+    const clientValues = (
+      product.id +
+      product.description +
+      product.price
+    ).toLowerCase();
     return (
       clientValues
         .normalize("NFD")
@@ -69,9 +73,10 @@ const ProductsTable = ({ products, searchValue }) => {
         </Box>
       ) : (
         <Alert
+          variant="filled"
           severity="warning"
           icon={<SentimentDissatisfiedOutlined sx={{ fontSize: "50px" }} />}
-          sx={{ display: "flex", alignItems: "center" }}
+          sx={{ display: "flex", alignItems: "center", mt: 2 }}
         >
           No se encontraron resultados...
         </Alert>

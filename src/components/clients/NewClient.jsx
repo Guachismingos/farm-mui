@@ -87,6 +87,7 @@ const NewClient = (props) => {
               <Grid item xs={12}>
                 <Collapse in={!!error.error} sx={{ width: "100%" }}>
                   <Alert
+                    variant="filled"
                     severity={error.type}
                     action={
                       <IconButton

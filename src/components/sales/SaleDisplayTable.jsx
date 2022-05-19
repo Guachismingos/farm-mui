@@ -1,5 +1,6 @@
 import {
   Alert,
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -8,12 +9,10 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TextField,
 } from "@mui/material";
 import { Fragment, useState } from "react";
-import { useSale } from "../../context/saleContext";
 
-const SelectedProductsTable = () => {
+const SaleDisplayTable = ({ products, total }) => {
   const columns = [
     { id: "description", label: "item" },
     {
@@ -35,8 +34,6 @@ const SelectedProductsTable = () => {
     },
   ];
 
-  const { selectedProducts, total, handleChangeQuantity } = useSale();
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -50,8 +47,8 @@ const SelectedProductsTable = () => {
   };
 
   return (
-    <Paper sx={{ width: "100%", overflow: "auto" }}>
-      {Object.values(selectedProducts).length > 0 ? (
+    <Paper sx={{ width: "100%", overflow: "auto", borderRadius: 0 }}>
+      {Object.values(products).length > 0 ? (
         <Fragment>
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table size="small" stickyHeader>
@@ -69,7 +66,7 @@ const SelectedProductsTable = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {Object.values(selectedProducts)
+                {Object.values(products)
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => {
                     return (
@@ -87,28 +84,9 @@ const SelectedProductsTable = () => {
                               style={{ maxWidth: column.maxWidth }}
                               align={column.align}
                             >
-                              {column.id !== "quantity" ? (
-                                column.format && typeof value === "number" ? (
-                                  column.format(value)
-                                ) : (
-                                  value
-                                )
-                              ) : (
-                                <TextField
-                                  type="number"
-                                  name={row.id}
-                                  value={row.quantity}
-                                  onChange={handleChangeQuantity}
-                                  inputProps={{
-                                    min: 1,
-                                    style: {
-                                      textAlign: "right",
-                                      padding: 1,
-                                      maxWidth: 50,
-                                    },
-                                  }}
-                                />
-                              )}
+                              {column.format && typeof value === "number"
+                                ? column.format(value)
+                                : value}
                             </TableCell>
                           );
                         })}
@@ -128,7 +106,7 @@ const SelectedProductsTable = () => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={Object.values(selectedProducts).length}
+            count={Object.values(products).length}
             rowsPerPage={rowsPerPage}
             labelRowsPerPage="Mostrar"
             labelDisplayedRows={({ from, to, count }) =>
@@ -141,11 +119,11 @@ const SelectedProductsTable = () => {
         </Fragment>
       ) : (
         <Alert variant="filled" severity="info" sx={{ py: 3 }}>
-          Aun no se han ingresado productos.
+          <CircularProgress /> Cargando productos.
         </Alert>
       )}
     </Paper>
   );
 };
 
-export default SelectedProductsTable;
+export default SaleDisplayTable;

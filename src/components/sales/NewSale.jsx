@@ -4,28 +4,28 @@ import {
   Alert,
   Avatar,
   Button,
+  ButtonGroup,
   CircularProgress,
   Collapse,
   Container,
   Divider,
   FormControl,
-  FormControlLabel,
   FormGroup,
   Grid,
   IconButton,
   InputLabel,
   MenuItem,
   Modal,
-  Radio,
   Select,
   Snackbar,
   Stack,
   TextField,
+  ToggleButton,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import useForm from "../../hooks/useForm";
 import {
+  AddCard,
   AddCircleOutlineOutlined,
   AddShoppingCartOutlined,
   Close,
@@ -38,21 +38,60 @@ import SearchBarProducts from "./SearchBarProducts";
 import SelectedProductsTable from "./SelectedProductsTable";
 import { useSale } from "../../context/saleContext";
 import NumberFormatCustom from "../custom/NumberFormatCustom";
+import { useAuth } from "../../context/AuthContext";
 
 const NewSale = (props) => {
   const {
     setClient,
+    client,
     selectedProducts,
     setSelectedProducts,
     payWith,
     setPayWith,
+    payAmount,
+    setPayAmount,
+    setCredit,
+    credit,
+    total,
   } = useSale();
+  const { saveSale } = useAuth();
   const [product, setProduct] = useState(null);
 
   const [error, setError] = useState({ error: null, type: "info" });
   const [loading, setLoading] = useState(false);
   const [addClientShow, setAddClientShow] = useState(false);
   const [showSnack, setShowSnack] = useState(false);
+
+  const handleNewSale = async (event) => {
+    event.preventDefault();
+    if (Object.keys(selectedProducts).length <= 0) {
+      setError({
+        error: "Aun no ingresan productos!!",
+        type: "warning",
+      });
+      return;
+    }
+    try {
+      setError({ ...error, error: null });
+      setLoading(true);
+      await saveSale(
+        client,
+        selectedProducts,
+        total,
+        credit,
+        credit ? parseInt(payAmount) : total,
+        payWith > 0 ? [{ type: payWith, payAmount: parseInt(payAmount) }] : []
+      );
+      props.showSnack(true);
+      props.onClose();
+    } catch (err) {
+      setError({
+        error: "Hubo un error al generar el pedido!!",
+        type: "error",
+      });
+    }
+    setLoading(false);
+  };
 
   return (
     <Modal
@@ -81,11 +120,12 @@ const NewSale = (props) => {
             </Avatar>{" "}
             Nueva Venta
           </Typography>
-          <Box component="form" onSubmit={null}>
+          <Box component="form" onSubmit={handleNewSale}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Collapse in={!!error.error} sx={{ width: "100%" }}>
+                <Collapse in={!!error.error} sx={{ width: "100%", pt: 2 }}>
                   <Alert
+                    variant="filled"
                     severity={error.type}
                     action={
                       <IconButton
@@ -112,7 +152,7 @@ const NewSale = (props) => {
                   <SearchBarClients
                     onChange={(_, value) => {
                       if (value) {
-                        setClient({ ...setClient, client: value.phone });
+                        setClient(value);
                       }
                     }}
                     sx={{ flexGrow: 1 }}
@@ -168,11 +208,19 @@ const NewSale = (props) => {
                 <FormControl fullWidth>
                   <InputLabel>Método de Pago</InputLabel>
                   <Select
+                    disabled={Object.keys(selectedProducts).length <= 0}
                     name="payWith"
-                    defaultValue={payWith}
+                    defaultValue={1}
                     label="Método de Pago"
-                    onChange={({ target }) => setPayWith(target.value)}
+                    onChange={({ target }) => {
+                      if (target.value === 0) {
+                        setCredit(true);
+                      }
+                      setPayAmount(0);
+                      setPayWith(target.value);
+                    }}
                   >
+                    <MenuItem value={0}>*Sin depósito*</MenuItem>
                     <MenuItem value={1}>Efectivo</MenuItem>
                     <MenuItem value={2}>Sinpe movíl</MenuItem>
                     <MenuItem value={3}>Transferencia bancaria</MenuItem>
@@ -180,24 +228,44 @@ const NewSale = (props) => {
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <FormGroup
-                  sx={{ display: "flex", flexDirection: "row", gap: 3 }}
-                >
-                  <FormControlLabel
-                    value="end"
-                    control={<Radio />}
-                    label="Crédito"
-                    sx={{ flexGrow: 1 }}
-                  />
+                <ButtonGroup fullWidth sx={{ gap: 2 }}>
+                  <ToggleButton
+                    disabled={Object.keys(selectedProducts).length <= 0}
+                    value="credit"
+                    color="standard"
+                    selected={!!credit}
+                    onChange={() => {
+                      if (payWith !== 0) {
+                        setCredit(!credit);
+                      }
+                      setPayAmount(0);
+                    }}
+                  >
+                    <AddCard sx={{ pr: 1 }} />
+                    Crédito
+                  </ToggleButton>
                   <TextField
                     label="Monto ₡"
                     variant="outlined"
+                    disabled={!credit || payWith === 0}
+                    required={!!credit}
+                    value={payAmount}
+                    onChange={({ target }) => {
+                      if (target.value > total) {
+                        setError({
+                          error: "Monto Ingresado es mayor al total!",
+                          type: "error",
+                        });
+                        return;
+                      }
+                      setPayAmount(target.value);
+                    }}
                     sx={{ flexGrow: 2 }}
                     InputProps={{
                       inputComponent: NumberFormatCustom,
                     }}
                   />
-                </FormGroup>
+                </ButtonGroup>
               </Grid>
               <Grid item xs={12}>
                 <Divider />
@@ -212,7 +280,7 @@ const NewSale = (props) => {
                   sx={{ py: 2 }}
                 >
                   {!loading ? (
-                    "Guardar"
+                    "Generar Venta"
                   ) : (
                     <CircularProgress size="26px" color="inherit" />
                   )}
@@ -232,6 +300,7 @@ const NewSale = (props) => {
           onClose={() => setShowSnack(false)}
         >
           <Alert
+            variant="filled"
             severity="success"
             onClose={() => setShowSnack(false)}
             sx={{ width: "250px" }}

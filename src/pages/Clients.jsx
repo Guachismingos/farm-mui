@@ -42,7 +42,7 @@ const Clients = () => {
     <Container
       maxWidth={false}
       sx={{
-        pt: "85px",
+        pt: "50px",
         px: 0,
         height: "100%",
         position: "fixed",
@@ -55,7 +55,7 @@ const Clients = () => {
         sx={{ textAlign: "center", pb: 10 }}
       >
         <Badge badgeContent={clients.length} color="secondary">
-          <Typography variant="h4" sx={{ mb: "80px" }}>
+          <Typography variant="h4" sx={{ mb: "40px" }}>
             Clientes
           </Typography>
         </Badge>
@@ -83,11 +83,11 @@ const Clients = () => {
                   fullWidth
                   onChange={(event) => setSearchValue(event.target.value)}
                 />
-                <Divider sx={{ pt: "10px" }}>lista de clientes</Divider>
+                <Divider sx={{ pt: "10px" }}>Lista de clientes</Divider>
                 <ClientsTable clients={clients} searchValue={searchValue} />
               </Box>
             ) : (
-              <Alert severity="warning" sx={{ py: 3 }}>
+              <Alert variant="filled" severity="warning" sx={{ py: 3 }}>
                 Aun no se han ingresado clientes.
               </Alert>
             )
@@ -109,6 +109,7 @@ const Clients = () => {
         onClose={() => setShowSnack(false)}
       >
         <Alert
+          variant="filled"
           severity="success"
           onClose={() => setShowSnack(false)}
           sx={{ width: "250px" }}

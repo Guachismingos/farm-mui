@@ -22,7 +22,7 @@ const ClientsTable = ({ clients, searchValue }) => {
   const searchResult = clients.filter((client) => {
     const clientValues = (
       client.name +
-      (client.type === "1" ? "Físico" : "Jurídico") +
+      (client.type === 1 ? "Físico" : "Jurídico") +
       client.phone +
       client.address
     ).toLowerCase();
@@ -42,37 +42,36 @@ const ClientsTable = ({ clients, searchValue }) => {
   return (
     <Box sx={{ maxHeight: "450px" }}>
       {searchResult.length > 0 ? (
-        <Box>
-          <List sx={{ maxHeight: "300px", overflow: "auto" }}>
-            {searchResult.map(({ name, type, phone }) => (
-              <ListItemButton
-                divider
-                key={phone}
-                sx={{ bgcolor: "background" }}
-                onClick={() => navigate(`/clients/${phone}`)}
-              >
-                <ListItemAvatar>
-                  {type === 1 ? (
-                    <Avatar variant="rounded" sx={{ bgcolor: blue[600] }}>
-                      <PersonOutlined />
-                    </Avatar>
-                  ) : (
-                    <Avatar variant="rounded" sx={{ bgcolor: amber[600] }}>
-                      <Business />
-                    </Avatar>
-                  )}
-                </ListItemAvatar>
-                <ListItemText primary={name} secondary={phone} />
-                <HelpOutlineOutlined fontSize="large" color="info" />
-              </ListItemButton>
-            ))}
-          </List>
-        </Box>
+        <List sx={{ maxHeight: "300px", overflow: "auto" }}>
+          {searchResult.map(({ name, type, phone }) => (
+            <ListItemButton
+              divider
+              key={phone}
+              sx={{ bgcolor: "background" }}
+              onClick={() => navigate(`/clients/${phone}`)}
+            >
+              <ListItemAvatar>
+                {type === 1 ? (
+                  <Avatar variant="rounded" sx={{ bgcolor: blue[600] }}>
+                    <PersonOutlined />
+                  </Avatar>
+                ) : (
+                  <Avatar variant="rounded" sx={{ bgcolor: amber[600] }}>
+                    <Business />
+                  </Avatar>
+                )}
+              </ListItemAvatar>
+              <ListItemText primary={name} secondary={phone} />
+              <HelpOutlineOutlined fontSize="large" color="info" />
+            </ListItemButton>
+          ))}
+        </List>
       ) : (
         <Alert
+          variant="filled"
           severity="warning"
           icon={<SentimentDissatisfiedOutlined sx={{ fontSize: "50px" }} />}
-          sx={{ display: "flex", alignItems: "center" }}
+          sx={{ display: "flex", alignItems: "center", mt: 2 }}
         >
           No se encontraron resultados...
         </Alert>

@@ -101,6 +101,7 @@ const Login = () => {
           <Typography variant="h5">Iniciar Sesión</Typography>
           <Collapse in={!!error.error} sx={{ width: "100%" }}>
             <Alert
+              variant="filled"
               severity={error.type}
               action={
                 <IconButton

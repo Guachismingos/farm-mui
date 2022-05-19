@@ -5,7 +5,7 @@ import Products from "../pages/Products";
 import Clients from "../pages/Clients";
 import ClientDisplay from "../components/clients/ClientDisplay";
 import ProductDisplay from "../components/products/ProductDisplay";
-import NewSale from "../components/sales/NewSale";
+import SaleDisplay from "../components/sales/SaleDisplay";
 
 const routes = [
   {
@@ -17,6 +17,11 @@ const routes = [
     path: "/sales",
     Component: Sales,
     name: "Ventas",
+  },
+  {
+    path: "/sales/:id",
+    Component: SaleDisplay,
+    name: "Venta",
   },
   {
     path: "/billing",
