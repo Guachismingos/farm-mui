@@ -1,9 +1,13 @@
-import { AddShoppingCartOutlined, Search } from "@mui/icons-material";
+import {
+  AddShoppingCartOutlined,
+  ReceiptLongOutlined,
+  Search,
+} from "@mui/icons-material";
 import {
   Alert,
-  Badge,
   Box,
   Button,
+  ButtonGroup,
   CircularProgress,
   Container,
   Divider,
@@ -13,32 +17,41 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import NewDeposit from "../components/sales/NewDeposit";
 import NewSale from "../components/sales/NewSale";
 import SalesTable from "../components/sales/SalesTable";
 import { useAuth } from "../context/AuthContext";
 import { useSale } from "../context/saleContext";
+import { DatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import bgLocale from "date-fns/locale/es";
 
 const Sales = () => {
   const { handleResetData } = useSale();
-  const { onGetData } = useAuth();
+  const { getSalesByDateQuery } = useAuth();
   const [addSaleShow, setAddSaleShow] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [addDepositShow, setAddDepositShow] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showSnack, setShowSnack] = useState(false);
   const [sales, setSales] = useState([]);
   const [searchValue, setSearchValue] = useState("");
+  const [dateValue, setDateValue] = useState(new Date());
+
+  const fetchData = async () => {
+    setLoading(true);
+    const unsubscribe = await getSalesByDateQuery(dateValue);
+    const docs = [];
+    unsubscribe.forEach((doc) => {
+      docs.push({ ...doc.data(), id: doc.id });
+    });
+    setSales(docs);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    setLoading(true);
-    const unsubscribe = onGetData("sales", (querySnapShot) => {
-      const docs = [];
-      querySnapShot.forEach((doc) => {
-        docs.push({ ...doc.data(), id: doc.id });
-      });
-      setSales(docs);
-      setLoading(false);
-    });
-    return unsubscribe;
-  }, [onGetData]);
+    fetchData();
+  }, [dateValue]);
 
   return (
     <Container
@@ -56,26 +69,39 @@ const Sales = () => {
         maxWidth="sm"
         sx={{ textAlign: "center", pb: 10 }}
       >
-        <Badge badgeContent={2} color="secondary">
-          <Typography variant="h4" sx={{ pb: "40px" }}>
-            Ventas
-          </Typography>
-        </Badge>
-        <Stack gap={2} sx={{ textAlign: "center" }}>
-          <Button
-            size="large"
-            variant="contained"
-            color="success"
-            sx={{ py: 2 }}
-            onClick={() => setAddSaleShow(true)}
+        <Typography variant="h4" sx={{ pb: "40px" }}>
+          Ventas
+        </Typography>
+        {!loading ? (
+          <Stack
+            gap={2}
+            sx={{ textAlign: "center" }}
+            className="animate__animated animate__zoomIn animate__faster"
           >
-            <AddShoppingCartOutlined sx={{ fontSize: "60px" }} />
-          </Button>
-          {!loading ? (
-            sales.length > 0 ? (
-              <Box>
+            <Box display="flex" gap={2}>
+              <Button
+                size="large"
+                variant="contained"
+                color="success"
+                sx={{ py: 2, flexGrow: 2 }}
+                onClick={() => setAddSaleShow(true)}
+              >
+                <AddShoppingCartOutlined sx={{ fontSize: "60px" }} />
+              </Button>
+              <Button
+                size="large"
+                variant="contained"
+                color="info"
+                sx={{ py: 2 }}
+                onClick={() => setAddDepositShow(true)}
+              >
+                <ReceiptLongOutlined sx={{ fontSize: "60px" }} />
+              </Button>
+            </Box>
+
+            <Box>
+              <ButtonGroup fullWidth sx={{ gap: 2 }}>
                 <TextField
-                  size="small"
                   label={
                     <Typography display="flex">
                       <Search sx={{ pr: 1 }} />
@@ -85,25 +111,52 @@ const Sales = () => {
                   fullWidth
                   onChange={(event) => setSearchValue(event.target.value)}
                 />
-                <Divider sx={{ pt: "10px" }}>Lista de ventas</Divider>
+                <LocalizationProvider
+                  dateAdapter={AdapterDateFns}
+                  adapterLocale={bgLocale}
+                >
+                  <DatePicker
+                    disableFuture
+                    label="Fecha"
+                    openTo="day"
+                    views={["day", "year", "month"]}
+                    value={dateValue}
+                    onChange={(newValue) => {
+                      setDateValue(newValue);
+                    }}
+                    renderInput={(params) => (
+                      <TextField fullWidth {...params} />
+                    )}
+                  />
+                </LocalizationProvider>
+              </ButtonGroup>
+              <Divider sx={{ pt: "10px" }}>Lista de ventas</Divider>
+              {sales.length > 0 ? (
                 <SalesTable sales={sales} searchValue={searchValue} />
-              </Box>
-            ) : (
-              <Alert variant="filled" severity="warning" sx={{ py: 3 }}>
-                Aun no hay ventas.
-              </Alert>
-            )
-          ) : (
-            <Box>
-              <CircularProgress size="50px" color="inherit" />
+              ) : (
+                <Alert variant="filled" severity="warning" sx={{ mt: 1 }}>
+                  No se encontraron ventas.
+                </Alert>
+              )}
             </Box>
-          )}
-        </Stack>
+          </Stack>
+        ) : (
+          <Box>
+            <CircularProgress size="50px" color="inherit" />
+          </Box>
+        )}
         <NewSale
           open={addSaleShow}
           onClose={() => {
             handleResetData();
             setAddSaleShow(false);
+          }}
+          showSnack={setShowSnack}
+        />
+        <NewDeposit
+          open={addDepositShow}
+          onClose={() => {
+            setAddDepositShow(false);
           }}
           showSnack={setShowSnack}
         />

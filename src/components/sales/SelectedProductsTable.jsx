@@ -117,7 +117,7 @@ const SelectedProductsTable = () => {
                   })}
                 <TableRow>
                   <TableCell colSpan={2} />
-                  <TableCell align="right">Total</TableCell>
+                  <TableCell align="right">Total ₡</TableCell>
                   <TableCell align="right">
                     {total.toLocaleString("en-US")}
                   </TableCell>

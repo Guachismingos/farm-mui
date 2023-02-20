@@ -95,7 +95,6 @@ const useThemeSelect = () => {
             backgroundColor: containerColor.light,
             borderRadius: 1.5,
             p: 2,
-            py: 8,
           }),
         },
       },
@@ -143,6 +142,21 @@ const useThemeSelect = () => {
           }),
         },
       },
+      MuiToggleButton: {
+        styleOverrides: {
+          // Name of the slot
+          root: {
+            // Some CSS
+            backgroundColor: backGroundColor.light,
+            "&:Mui-selected": {
+              backgroundColor: backGroundColor.light,
+            },
+          },
+          "&:selected": {
+            backgroundColor: backGroundColor.light,
+          },
+        },
+      },
     },
   });
 
@@ -186,7 +200,6 @@ const useThemeSelect = () => {
             backgroundColor: containerColor.dark,
             borderRadius: 1.5,
             p: 2,
-            py: 8,
           }),
         },
       },

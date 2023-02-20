@@ -50,7 +50,6 @@ const NewProduct = (props) => {
         error: "Ocurrio algo inesperado!",
         type: "error",
       });
-      console.log(err);
     }
     setLoading(false);
   };
@@ -58,7 +57,7 @@ const NewProduct = (props) => {
   return (
     <Modal
       open={props.open}
-      onClose={props.onCLose}
+      onClose={props.onClose}
       sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
     >
       <Container maxWidth="sm" sx={{ background: "transparent" }}>
@@ -67,7 +66,13 @@ const NewProduct = (props) => {
             <IconButton
               color="inherit"
               edge="end"
-              onClick={() => props.onClose()}
+              onClick={() => {
+                props.onClose();
+                setValues({
+                  description: "",
+                  price: "",
+                });
+              }}
             >
               <Close />
             </IconButton>
@@ -94,7 +99,7 @@ const NewProduct = (props) => {
                         <CloseOutlined fontSize="inherit" />
                       </IconButton>
                     }
-                    sx={{ mb: 2 }}
+                    sx={{ mt: 2 }}
                   >
                     {error.error}
                   </Alert>
@@ -143,7 +148,7 @@ const NewProduct = (props) => {
                   sx={{ py: 2 }}
                 >
                   {!loading ? (
-                    "Guargar"
+                    "Guardar"
                   ) : (
                     <CircularProgress size="26px" color="inherit" />
                   )}

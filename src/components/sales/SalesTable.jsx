@@ -6,6 +6,7 @@ import {
 import {
   Alert,
   Avatar,
+  Badge,
   Box,
   Chip,
   List,
@@ -22,7 +23,9 @@ const SalesTable = ({ sales, searchValue }) => {
       sale.id +
       sale.clientData.id +
       sale.clientData.name +
-      (sale.credit ? "credito" : "contado")
+      (sale.credit ? "credito" : "contado") +
+      (sale.paid ? "cancelado cancelada" : "por cobrar") +
+      (sale.done ? "entregado" : "entrega pendiente")
     ).toLowerCase();
     return (
       clientValues
@@ -42,7 +45,15 @@ const SalesTable = ({ sales, searchValue }) => {
       {searchResult.length > 0 ? (
         <List sx={{ maxHeight: "300px", overflow: "auto" }}>
           {searchResult.map(
-            ({ id, clientData: { name, phone }, date, credit, total }) => (
+            ({
+              id,
+              clientData: { name, phone },
+              date,
+              credit,
+              total,
+              paid,
+              done,
+            }) => (
               <ListItemButton
                 divider
                 key={id}
@@ -61,6 +72,27 @@ const SalesTable = ({ sales, searchValue }) => {
                   <Box>
                     <Typography>{`${name}, ${phone}`}</Typography>
                     <Typography variant="body2">{id}</Typography>
+                    <Badge
+                      variant="dot"
+                      color="error"
+                      invisible={paid}
+                      sx={{ mr: 1 }}
+                    >
+                      <Chip
+                        size="small"
+                        variant="filled"
+                        color={paid ? "success" : "warning"}
+                        label={paid ? "Cancelado" : "Por cobrar!"}
+                      />
+                    </Badge>
+                    <Badge variant="dot" color="error" invisible={done}>
+                      <Chip
+                        size="small"
+                        variant="filled"
+                        color={done ? "success" : "warning"}
+                        label={done ? "Entregado" : "Entrega Pendiente!"}
+                      />
+                    </Badge>
                   </Box>
                   <Box textAlign="end">
                     <Typography variant="caption">
@@ -74,11 +106,13 @@ const SalesTable = ({ sales, searchValue }) => {
                       />
                     </Typography>
                     <br />
-                    <Typography variant="caption">{date}</Typography>
+                    <Typography variant="caption">
+                      {new Date(date).toLocaleDateString("es-CR")}
+                    </Typography>
                     <Chip
                       size="small"
                       variant="filled"
-                      color={credit ? "warning" : "success"}
+                      color={credit ? "secondary" : "primary"}
                       label={credit ? "Crédito" : "Contado"}
                     />
                   </Box>

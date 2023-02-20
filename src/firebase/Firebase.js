@@ -3,12 +3,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const app = initializeApp({
-  apiKey: "AIzaSyAhfz_szy4zdxPHQW_ejW3Y-C_UphhdLJc",
-  authDomain: "farm-developmet.firebaseapp.com",
-  projectId: "farm-developmet",
-  storageBucket: "farm-developmet.appspot.com",
-  messagingSenderId: "11899910164",
-  appId: "1:11899910164:web:21dffe61c5f489913c4f01",
+  apiKey: "AIzaSyBAXODC-deWCdkVDOerm7u4M40t8DkHpQQ",
+  authDomain: "granja-alfonso-chaves.firebaseapp.com",
+  projectId: "granja-alfonso-chaves",
+  storageBucket: "granja-alfonso-chaves.appspot.com",
+  messagingSenderId: "614187785088",
+  appId: "1:614187785088:web:124a955cec157458d5ff65",
+  measurementId: "G-481KPZDC4H"
 });
 
 export const db = getFirestore(app);

@@ -12,6 +12,7 @@ export const SaleProvider = ({ children }) => {
   const [client, setClient] = useState(null);
   const [payWith, setPayWith] = useState(1);
   const [credit, setCredit] = useState(false);
+  const [done, setDone] = useState(true);
   const [payAmount, setPayAmount] = useState(0);
 
   const handleChangeQuantity = ({ target: { name, value } }) => {
@@ -52,6 +53,8 @@ export const SaleProvider = ({ children }) => {
     setCredit,
     setPayAmount,
     handleResetData,
+    done,
+    setDone,
   };
 
   useEffect(() => {

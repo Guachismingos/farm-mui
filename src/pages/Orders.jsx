@@ -1,4 +1,5 @@
-import { MoneyOffCsredOutlined, Search } from "@mui/icons-material";
+import { useState } from "react";
+import { AddTask, Search } from "@mui/icons-material";
 import {
   Alert,
   Box,
@@ -11,30 +12,27 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import BillsTable from "../components/bills/BillsTable";
-import NewBill from "../components/bills/NewBill";
-import PayBill from "../components/bills/PayBill";
+import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import NewOrder from "../components/orders/NewOrder";
+import OrdersTable from "../components/orders/OrdersTable";
 
-const Billing = () => {
+const Orders = () => {
   const { onGetData } = useAuth();
-  const [addBillShow, setAddBillShow] = useState(false);
-  const [payBillShow, setPayBillShow] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState([]);
   const [showSnack, setShowSnack] = useState(false);
-  const [bills, setBills] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [selectedId, setSelectedId] = useState(null);
+  const [addOrderShow, setAddOrderShow] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    const unsubscribe = onGetData("bills", (querySnapShot) => {
+    const unsubscribe = onGetData("orders", (querySnapShot) => {
       const docs = [];
       querySnapShot.forEach((doc) => {
         docs.push({ ...doc.data(), id: doc.id });
       });
-      setBills(docs);
+      setOrders(docs);
       setLoading(false);
     });
     return unsubscribe;
@@ -57,7 +55,7 @@ const Billing = () => {
         sx={{ textAlign: "center", pb: 10 }}
       >
         <Typography variant="h4" sx={{ mb: "40px" }}>
-          Gastos
+          Pedidos
         </Typography>
         {!loading ? (
           <Stack
@@ -68,13 +66,13 @@ const Billing = () => {
             <Button
               size="large"
               variant="contained"
-              color="warning"
+              color="success"
               sx={{ py: 2 }}
-              onClick={() => setAddBillShow(true)}
+              onClick={() => setAddOrderShow(true)}
             >
-              <MoneyOffCsredOutlined sx={{ fontSize: "60px", m: 0, p: 0 }} />
+              <AddTask sx={{ fontSize: "60px", m: 0, p: 0 }} />
             </Button>
-            {bills.length > 0 ? (
+            {orders.length > 0 ? (
               <Box>
                 <TextField
                   size="small"
@@ -88,16 +86,11 @@ const Billing = () => {
                   onChange={(event) => setSearchValue(event.target.value)}
                 />
                 <Divider sx={{ pt: "10px" }}>Lista de gastos</Divider>
-                <BillsTable
-                  bills={bills}
-                  searchValue={searchValue}
-                  setSelectedId={setSelectedId}
-                  setPayBillShow={setPayBillShow}
-                />
+                <OrdersTable orders={orders} searchValue={searchValue} />
               </Box>
             ) : (
-              <Alert variant="filled" severity="info" sx={{ py: 3 }}>
-                Aun no se han ingresado gastos.
+              <Alert variant="filled" severity="warning" sx={{ py: 3 }}>
+                Aun no se han ingresado pedidos.
               </Alert>
             )}
           </Stack>
@@ -107,33 +100,18 @@ const Billing = () => {
           </Box>
         )}
       </Container>
-      <NewBill
-        open={addBillShow}
-        onClose={() => setAddBillShow(false)}
+      <NewOrder
+        open={addOrderShow}
+        onClose={() => setAddOrderShow(false)}
         showSnack={setShowSnack}
-      />
-      <PayBill
-        open={payBillShow}
-        onClose={() => setPayBillShow(false)}
-        showSnack={setShowSnack}
-        selectedId={selectedId}
       />
       <Snackbar
         open={showSnack}
         autoHideDuration={4000}
         onClose={() => setShowSnack(false)}
-      >
-        <Alert
-          variant="filled"
-          severity="success"
-          onClose={() => setShowSnack(false)}
-          sx={{ width: "250px" }}
-        >
-          Se guardaron los gastos con exito!
-        </Alert>
-      </Snackbar>
+      ></Snackbar>
     </Container>
   );
 };
 
-export default Billing;
+export default Orders;

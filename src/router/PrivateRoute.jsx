@@ -8,12 +8,12 @@ const PrivateRoute = ({ isPrivate = false }) => {
     currentUser ? (
       <Outlet />
     ) : (
-      <Navigate to="/login" />
+      <Navigate replace to="/login" />
     )
   ) : !currentUser ? (
     <Outlet />
   ) : (
-    <Navigate to="/" />
+    <Navigate replace to="/" />
   );
 };
 

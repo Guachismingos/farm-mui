@@ -31,3 +31,7 @@ form {
 ::-webkit-scrollbar-thumb:hover {
   background: #555555a8;
 }
+
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}

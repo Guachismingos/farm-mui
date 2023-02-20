@@ -72,7 +72,9 @@ const SearchBarProducts = ({ product, setProduct }) => {
         setOpen(false);
       }}
       isOptionEqualToValue={(option, value) => option.id === `${value.id}`}
-      getOptionLabel={({ id, description }) => `${description}, ${id}`}
+      getOptionLabel={({ description, price }) =>
+        `${description}, ₡ ${price.toLocaleString("en-US")}`
+      }
       noOptionsText="No se encontraron productos..."
       renderInput={(params) => (
         <TextField

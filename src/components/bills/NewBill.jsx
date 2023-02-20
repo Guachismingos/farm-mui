@@ -11,7 +11,6 @@ import {
   Container,
   Divider,
   FormControl,
-  FormHelperText,
   Grid,
   IconButton,
   InputLabel,
@@ -26,33 +25,59 @@ import useForm from "../../hooks/useForm";
 import {
   Close,
   CloseOutlined,
-  PersonAddAlt1Outlined,
+  MoneyOffCsredOutlined,
 } from "@mui/icons-material";
+import NumberFormatCustom from "../custom/NumberFormatCustom";
 
-const NewClient = (props) => {
-  const [{ name, type, phone, address }, handleInputChange] = useForm({
-    name: "",
-    type: 1,
-    phone: "",
-    address: "",
+const NewBill = (props) => {
+  const [
+    { description, total, credit, payAmount },
+    handleInputChange,
+    setValues,
+  ] = useForm({
+    description: "",
+    total: "",
+    credit: 1,
+    payAmount: 0,
   });
 
   const [error, setError] = useState({ error: null, type: "info" });
   const [loading, setLoading] = useState(false);
+  const [cred, setCred] = useState(false);
 
-  const { saveClient } = useAuth();
+  const { saveBill } = useAuth();
 
-  const handleNewClient = async (event) => {
+  const handleNewBill = async (event) => {
     event.preventDefault();
     try {
       setError({ ...error, error: null });
       setLoading(true);
-      await saveClient(name, type, phone, address);
+      const today = new Date();
+      await saveBill(
+        description,
+        parseFloat(total),
+        credit === 1 ? false : true,
+        credit === 1 ? true : false,
+        credit === 2 ? parseInt(payAmount) : parseInt(total),
+        parseInt(payAmount) === 0 && credit === 2
+          ? []
+          : [
+              {
+                payAmount: credit === 2 ? parseInt(payAmount) : parseInt(total),
+                date: today.toDateString(),
+                month: today.getMonth(),
+                year: today.getFullYear(),
+              },
+            ],
+        today.toDateString(),
+        today.getMonth(),
+        today.getFullYear()
+      );
       props.showSnack(true);
       props.onClose();
     } catch (err) {
       setError({
-        error: "Ya existe un usuario con el numero registrado!",
+        error: "Ocurrio algo inesperado!",
         type: "error",
       });
     }
@@ -71,18 +96,26 @@ const NewClient = (props) => {
             <IconButton
               color="inherit"
               edge="end"
-              onClick={() => props.onClose()}
+              onClick={() => {
+                props.onClose();
+                setValues({
+                  description: "",
+                  total: "",
+                  credit: 1,
+                  payAmount: 0,
+                });
+              }}
             >
               <Close />
             </IconButton>
           </Box>
           <Typography display="flex" alignItems="center" gap={1} variant="h5">
             <Avatar variant="rounded">
-              <PersonAddAlt1Outlined />
+              <MoneyOffCsredOutlined />
             </Avatar>{" "}
-            Nuevo Cliente
+            Nuevo Gasto
           </Typography>
-          <Box component="form" onSubmit={handleNewClient}>
+          <Box component="form" onSubmit={handleNewBill}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Collapse in={!!error.error} sx={{ width: "100%" }}>
@@ -110,56 +143,71 @@ const NewClient = (props) => {
               <Grid item xs={12}>
                 <TextField
                   type="text"
-                  name="name"
-                  label="Nombre:"
+                  name="description"
+                  label="Descripción:"
                   disabled={loading}
+                  value={description}
                   fullWidth
                   required
                   onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  name="total"
+                  label="Total:"
+                  disabled={loading}
+                  value={total}
+                  fullWidth
+                  required
+                  onChange={handleInputChange}
+                  InputProps={{
+                    inputComponent: NumberFormatCustom,
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <InputLabel>Tipo:</InputLabel>
                   <Select
-                    name="type"
+                    name="credit"
                     label="Tipo:"
                     disabled={loading}
                     defaultValue={1}
                     onChange={handleInputChange}
                   >
-                    <MenuItem value={1}>Físico</MenuItem>
-                    <MenuItem value={2}>Jurídico</MenuItem>
+                    <MenuItem
+                      value={1}
+                      onClick={() => {
+                        setCred(false);
+                      }}
+                    >
+                      Débito
+                    </MenuItem>
+                    <MenuItem
+                      value={2}
+                      onClick={() => {
+                        setCred(true);
+                      }}
+                    >
+                      Crédito
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  type="tel"
-                  name="phone"
-                  label="Teléfono:"
-                  disabled={loading}
-                  inputProps={{ pattern: "[0-9]{4,}" }}
+                  name="payAmount"
+                  label="Abono:"
+                  disabled={loading || !cred}
+                  value={payAmount}
                   fullWidth
                   required
                   onChange={handleInputChange}
+                  InputProps={{
+                    inputComponent: NumberFormatCustom,
+                  }}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <TextField
-                    type="text"
-                    name="address"
-                    label="Dirección:"
-                    disabled={loading}
-                    inputProps={{ maxLength: 120 }}
-                    multiline
-                    rows={3}
-                    required
-                    onChange={handleInputChange}
-                  />
-                  <FormHelperText>Máximo 120 caracteres.</FormHelperText>
-                </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <Divider />
@@ -188,5 +236,4 @@ const NewClient = (props) => {
     </Modal>
   );
 };
-
-export default NewClient;
+export default NewBill;

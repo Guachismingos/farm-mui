@@ -66,10 +66,12 @@ const ClientDisplay = () => {
       }
       setLoading(false);
     } catch (err) {
-      setError(err);
-      console.log(error);
+      setError({
+        error: `Error al Cargar el cliente!! (${err})`,
+        type: "error",
+      });
     }
-  }, [getClientbyId, id, setValues, navigate, error]);
+  }, [getClientbyId, id, setValues, navigate]);
 
   useEffect(() => {
     if (id) {
@@ -110,160 +112,167 @@ const ClientDisplay = () => {
     >
       <Container
         className="animate__animated animate__zoomIn animate__faster"
-        maxWidth="sm"
+        maxWidth="lg"
         sx={{ textAlign: "center", pb: 10 }}
       >
         <Typography variant="h4" sx={{ mb: "40px" }}>
           Información del Cliente
         </Typography>
-        <Stack gap={0} sx={{ pt: 1, textAlign: "left" }}>
-          <Box component="form" onSubmit={handleSaveClient}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Collapse in={!!error.error} sx={{ width: "100%" }}>
-                  <Alert
-                    variant="filled"
-                    severity={error.type}
-                    action={
-                      <IconButton
-                        color="inherit"
-                        size="small"
-                        onClick={() => setError({ ...error, error: null })}
+        <Grid container spacing={2}>
+          <Grid xs={4} item>
+            <Stack gap={0} height="100%" sx={{ textAlign: "left" }}>
+              <Box component="form" onSubmit={handleSaveClient}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Collapse in={!!error.error} sx={{ width: "100%" }}>
+                      <Alert
+                        variant="filled"
+                        severity={error.type}
+                        action={
+                          <IconButton
+                            color="inherit"
+                            size="small"
+                            onClick={() => setError({ ...error, error: null })}
+                          >
+                            <CloseOutlined fontSize="inherit" />
+                          </IconButton>
+                        }
+                        sx={{ mb: 2 }}
                       >
-                        <CloseOutlined fontSize="inherit" />
-                      </IconButton>
-                    }
-                    sx={{ mb: 2 }}
-                  >
-                    {error.error}
-                  </Alert>
-                </Collapse>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  type="text"
-                  name="name"
-                  label="Nombre:"
-                  disabled={loading}
-                  inputProps={{ readOnly: readOnly }}
-                  fullWidth
-                  required
-                  value={name}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Tipo:</InputLabel>
-                  <Select
-                    name="type"
-                    label="Tipo:"
-                    disabled={loading}
-                    inputProps={{ readOnly: readOnly }}
-                    defaultValue={1}
-                    value={type}
-                    onChange={handleInputChange}
-                  >
-                    <MenuItem value={1}>Físico</MenuItem>
-                    <MenuItem value={2}>Jurídico</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  type="tel"
-                  name="phone"
-                  label="Teléfono:"
-                  disabled={loading}
-                  inputProps={{ readOnly: readOnly, pattern: "[0-9]{4,}" }}
-                  fullWidth
-                  required
-                  value={phone}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <TextField
-                    type="text"
-                    name="address"
-                    label="Dirección:"
-                    disabled={loading}
-                    inputProps={{ maxLength: 120, readOnly: readOnly }}
-                    multiline
-                    rows={3}
-                    required
-                    value={address}
-                    onChange={handleInputChange}
-                  />
-                  <FormHelperText>Máximo 120 caracteres.</FormHelperText>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <Divider />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={1}>
-                  <Grid item xs={6}>
-                    <Button
-                      fullWidth
-                      size="large"
-                      variant="contained"
-                      color="error"
-                      sx={{ flexGrow: 1 }}
-                      onClick={() => setShowDialog(true)}
-                    >
-                      <Delete sx={{ pr: 1 }} /> Eliminar
-                    </Button>
+                        {error.error}
+                      </Alert>
+                    </Collapse>
                   </Grid>
-                  <Grid item xs={6}>
-                    <Button
+                  <Grid item xs={12}>
+                    <TextField
+                      type="text"
+                      name="name"
+                      label="Nombre:"
+                      disabled={loading}
+                      inputProps={{ readOnly: readOnly }}
                       fullWidth
-                      size="large"
-                      variant="contained"
-                      color={`${readOnly ? "success" : "warning"}`}
-                      sx={{ flexGrow: 1 }}
-                      onClick={() => {
-                        readOnly
-                          ? setReadOnly(!readOnly)
-                          : handleLoadCLient() && setReadOnly(!readOnly);
-                      }}
-                    >
-                      {readOnly ? (
-                        <>
-                          <DriveFileRenameOutlineOutlined sx={{ pr: 1 }} />{" "}
-                          Editar
-                        </>
-                      ) : (
-                        <>
-                          <KeyboardReturnOutlined sx={{ pr: 1 }} /> Cancelar
-                        </>
-                      )}
-                    </Button>
+                      required
+                      value={name}
+                      onChange={handleInputChange}
+                    />
                   </Grid>
+                  <Grid item xs={12}>
+                    <FormControl fullWidth>
+                      <InputLabel>Tipo:</InputLabel>
+                      <Select
+                        name="type"
+                        label="Tipo:"
+                        disabled={loading}
+                        inputProps={{ readOnly: readOnly }}
+                        defaultValue={1}
+                        value={type}
+                        onChange={handleInputChange}
+                      >
+                        <MenuItem value={1}>Físico</MenuItem>
+                        <MenuItem value={2}>Jurídico</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      type="tel"
+                      name="phone"
+                      label="Teléfono:"
+                      disabled={loading}
+                      inputProps={{ readOnly: readOnly, pattern: "[0-9]{4,}" }}
+                      fullWidth
+                      required
+                      value={phone}
+                      onChange={handleInputChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControl fullWidth>
+                      <TextField
+                        type="text"
+                        name="address"
+                        label="Dirección:"
+                        disabled={loading}
+                        inputProps={{ maxLength: 120, readOnly: readOnly }}
+                        multiline
+                        rows={3}
+                        required
+                        value={address}
+                        onChange={handleInputChange}
+                      />
+                      <FormHelperText>Máximo 120 caracteres.</FormHelperText>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Grid container spacing={1}>
+                      <Grid item xs={6}>
+                        <Button
+                          fullWidth
+                          size="large"
+                          variant="contained"
+                          color="error"
+                          sx={{ flexGrow: 1 }}
+                          onClick={() => setShowDialog(true)}
+                        >
+                          <Delete sx={{ pr: 1 }} /> Eliminar
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          fullWidth
+                          size="large"
+                          variant="contained"
+                          color={`${readOnly ? "success" : "warning"}`}
+                          sx={{ flexGrow: 1 }}
+                          onClick={() => {
+                            readOnly
+                              ? setReadOnly(!readOnly)
+                              : handleLoadCLient() && setReadOnly(!readOnly);
+                          }}
+                        >
+                          {readOnly ? (
+                            <>
+                              <DriveFileRenameOutlineOutlined sx={{ pr: 1 }} />{" "}
+                              Editar
+                            </>
+                          ) : (
+                            <>
+                              <KeyboardReturnOutlined sx={{ pr: 1 }} /> Cancelar
+                            </>
+                          )}
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  {!readOnly && (
+                    <Grid item xs={12}>
+                      <Button
+                        disabled={loading}
+                        type="submit"
+                        size="large"
+                        fullWidth
+                        variant="contained"
+                        sx={{ py: 2 }}
+                      >
+                        {!loading ? (
+                          "Guardar Cambios"
+                        ) : (
+                          <CircularProgress size="26px" color="inherit" />
+                        )}
+                      </Button>
+                    </Grid>
+                  )}
                 </Grid>
-              </Grid>
-              {!readOnly && (
-                <Grid item xs={12}>
-                  <Button
-                    disabled={loading}
-                    type="submit"
-                    size="large"
-                    fullWidth
-                    variant="contained"
-                    sx={{ py: 2 }}
-                  >
-                    {!loading ? (
-                      "Guargar Cambios"
-                    ) : (
-                      <CircularProgress size="26px" color="inherit" />
-                    )}
-                  </Button>
-                </Grid>
-              )}
-            </Grid>
-          </Box>
-        </Stack>
+              </Box>
+            </Stack>
+          </Grid>
+          <Grid xs={6} item>
+            <Stack height="100%"></Stack>
+          </Grid>
+        </Grid>
       </Container>
       <Dialog open={showDialog} onClose={() => setShowDialog(false)}>
         <DialogTitle>Está seguro que desea continuar?</DialogTitle>

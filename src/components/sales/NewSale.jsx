@@ -30,6 +30,7 @@ import {
   AddShoppingCartOutlined,
   Close,
   CloseOutlined,
+  LocalShippingOutlined,
   PersonAddOutlined,
 } from "@mui/icons-material";
 import SearchBarClients from "./SearchBarClients";
@@ -39,6 +40,7 @@ import SelectedProductsTable from "./SelectedProductsTable";
 import { useSale } from "../../context/saleContext";
 import NumberFormatCustom from "../custom/NumberFormatCustom";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const NewSale = (props) => {
   const {
@@ -52,9 +54,14 @@ const NewSale = (props) => {
     setPayAmount,
     setCredit,
     credit,
+    setDone,
+    done,
     total,
   } = useSale();
-  const { saveSale } = useAuth();
+
+  const navigate = useNavigate();
+
+  const { saveSale, saveRecovery } = useAuth();
   const [product, setProduct] = useState(null);
 
   const [error, setError] = useState({ error: null, type: "info" });
@@ -69,26 +76,56 @@ const NewSale = (props) => {
         error: "Aun no ingresan productos!!",
         type: "warning",
       });
-      return;
-    }
-    try {
-      setError({ ...error, error: null });
-      setLoading(true);
-      await saveSale(
-        client,
-        selectedProducts,
-        total,
-        credit,
-        credit ? parseInt(payAmount) : total,
-        payWith > 0 ? [{ type: payWith, payAmount: parseInt(payAmount) }] : []
-      );
-      props.showSnack(true);
-      props.onClose();
-    } catch (err) {
-      setError({
-        error: "Hubo un error al generar el pedido!!",
-        type: "error",
-      });
+    } else {
+      try {
+        setError({ ...error, error: null });
+        setLoading(true);
+        const today = new Date();
+        const refNewSale = await saveSale(
+          client,
+          selectedProducts,
+          total,
+          credit,
+          done,
+          !credit ? true : false,
+          credit ? parseInt(payAmount) : total,
+          today.toDateString(),
+          today.getMonth(),
+          today.getFullYear(),
+          payWith > 0
+            ? [
+                {
+                  type: payWith,
+                  payAmount: credit ? parseInt(payAmount) : parseInt(total),
+                  date: today.toDateString(),
+                  month: today.getMonth(),
+                  year: today.getFullYear(),
+                },
+              ]
+            : []
+        );
+        
+        if (credit) {
+          await saveRecovery(
+            refNewSale,
+            client.name,
+            parseInt(payAmount),
+            today.toDateString(),
+            today.getMonth(),
+            today.getFullYear(),
+            payWith
+          );
+        }
+
+        props.showSnack(true);
+        !!refNewSale && navigate(`/sales/${refNewSale}`);
+        props.onClose();
+      } catch (err) {
+        setError({
+          error: `Hubo un error al generar el pedido!!, ${err}`,
+          type: "error",
+        });
+      }
     }
     setLoading(false);
   };
@@ -96,7 +133,7 @@ const NewSale = (props) => {
   return (
     <Modal
       open={props.open}
-      onClose={props.onCLose}
+      onClose={props.onClose}
       sx={{ overflow: "auto", pb: 6 }}
     >
       <Container maxWidth="md" sx={{ background: "transparent", mt: 6 }}>
@@ -123,7 +160,7 @@ const NewSale = (props) => {
           <Box component="form" onSubmit={handleNewSale}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Collapse in={!!error.error} sx={{ width: "100%", pt: 2 }}>
+                <Collapse in={!!error.error} sx={{ width: "100%" }}>
                   <Alert
                     variant="filled"
                     severity={error.type}
@@ -136,7 +173,7 @@ const NewSale = (props) => {
                         <CloseOutlined fontSize="inherit" />
                       </IconButton>
                     }
-                    sx={{ mb: 2 }}
+                    sx={{ mt: 2 }}
                   >
                     {error.error}
                   </Alert>
@@ -240,6 +277,7 @@ const NewSale = (props) => {
                       }
                       setPayAmount(0);
                     }}
+                    sx={{ borderWidth: 2 }}
                   >
                     <AddCard sx={{ pr: 1 }} />
                     Crédito
@@ -251,16 +289,13 @@ const NewSale = (props) => {
                     required={!!credit}
                     value={payAmount}
                     onChange={({ target }) => {
-                      if (target.value > total) {
-                        setError({
-                          error: "Monto Ingresado es mayor al total!",
-                          type: "error",
-                        });
-                        return;
+                      if (parseInt(target.value) > total) {
+                        setPayAmount(total);
+                      } else {
+                        setPayAmount(target.value);
                       }
-                      setPayAmount(target.value);
                     }}
-                    sx={{ flexGrow: 2 }}
+                    sx={{ flexGrow: 4 }}
                     InputProps={{
                       inputComponent: NumberFormatCustom,
                     }}
@@ -271,8 +306,23 @@ const NewSale = (props) => {
                 <Divider />
               </Grid>
               <Grid item xs={12}>
+                <ToggleButton
+                  fullWidth
+                  disabled={Object.keys(selectedProducts).length <= 0}
+                  value={done}
+                  color="success"
+                  selected={!!done}
+                  onChange={() => setDone(!done)}
+                  sx={{ borderWidth: 3 }}
+                >
+                  <LocalShippingOutlined sx={{ pr: 1 }} />
+                  Entregado
+                </ToggleButton>
+              </Grid>
+              <Grid item xs={12}>
                 <Button
                   fullWidth
+                  disabled={loading}
                   size="large"
                   variant="contained"
                   color="success"

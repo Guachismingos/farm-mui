@@ -60,10 +60,12 @@ const ProductDisplay = () => {
       }
       setLoading(false);
     } catch (err) {
-      setError(err);
-      console.log(error);
+      setError({
+        error: `Error al Cargar el producto!! (${err})`,
+        type: "error",
+      });
     }
-  }, [getProductbyId, id, setValues, navigate, error]);
+  }, [getProductbyId, id, setValues, navigate]);
 
   useEffect(() => {
     if (id) {
@@ -77,7 +79,7 @@ const ProductDisplay = () => {
     try {
       setLoading(true);
       await deleteProductById(id).then(
-        await saveProductById(id, description, price)
+        await saveProductById(id, description, parseFloat(price))
       );
       setReadOnly(!readOnly);
       setShowSnack(true);
@@ -133,9 +135,7 @@ const ProductDisplay = () => {
                   </Alert>
                 </Collapse>
               </Grid>
-              <Grid item xs={12}>
-                <Divider />
-              </Grid>
+              <Grid item xs={12}></Grid>
               <Grid item xs={12}>
                 <TextField
                   type="text"
@@ -144,7 +144,7 @@ const ProductDisplay = () => {
                   disabled={loading}
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment>
+                      <InputAdornment position="end">
                         <LockOutlined />
                       </InputAdornment>
                     ),
@@ -237,7 +237,7 @@ const ProductDisplay = () => {
                     sx={{ py: 2 }}
                   >
                     {!loading ? (
-                      "Guargar Cambios"
+                      "Guardar Cambios"
                     ) : (
                       <CircularProgress size="26px" color="inherit" />
                     )}

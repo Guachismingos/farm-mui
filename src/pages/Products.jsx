@@ -20,7 +20,7 @@ import { useAuth } from "../context/AuthContext";
 const Products = () => {
   const { onGetData } = useAuth();
   const [addProductShow, setAddProductShow] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showSnack, setShowSnack] = useState(false);
   const [products, setProducts] = useState([]);
   const [searchValue, setSearchValue] = useState("");
@@ -59,18 +59,22 @@ const Products = () => {
             Productos
           </Typography>
         </Badge>
-        <Stack gap={2} sx={{ textAlign: "center" }}>
-          <Button
-            size="large"
-            variant="contained"
-            color="success"
-            sx={{ py: 2 }}
-            onClick={() => setAddProductShow(true)}
+        {!loading ? (
+          <Stack
+            gap={2}
+            sx={{ textAlign: "center" }}
+            className="animate__animated animate__zoomIn animate__faster"
           >
-            <MedicalServicesOutlined sx={{ fontSize: "60px" }} />
-          </Button>
-          {!loading ? (
-            products.length > 0 ? (
+            <Button
+              size="large"
+              variant="contained"
+              color="success"
+              sx={{ py: 2 }}
+              onClick={() => setAddProductShow(true)}
+            >
+              <MedicalServicesOutlined sx={{ fontSize: "60px" }} />
+            </Button>
+            {products.length > 0 ? (
               <Box>
                 <TextField
                   size="small"
@@ -90,13 +94,13 @@ const Products = () => {
               <Alert variant="filled" severity="warning" sx={{ py: 3 }}>
                 Aun no se han ingresado clientes.
               </Alert>
-            )
-          ) : (
-            <Box>
-              <CircularProgress size="50px" color="inherit" />
-            </Box>
-          )}
-        </Stack>
+            )}
+          </Stack>
+        ) : (
+          <Box>
+            <CircularProgress size="50px" color="inherit" />
+          </Box>
+        )}
       </Container>
       <NewProduct
         open={addProductShow}

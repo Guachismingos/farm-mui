@@ -10,51 +10,57 @@ import {
   Collapse,
   Container,
   Divider,
-  FormControl,
-  FormHelperText,
+  FormGroup,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
   Modal,
-  Select,
+  Snackbar,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import useForm from "../../hooks/useForm";
+import SearchBarClients from "./../sales/SearchBarClients";
+import NewClient from "./../clients/NewClient";
 import {
+  CheckCircleOutlined,
   Close,
   CloseOutlined,
-  PersonAddAlt1Outlined,
+  PersonAddOutlined,
 } from "@mui/icons-material";
-
-const NewClient = (props) => {
-  const [{ name, type, phone, address }, handleInputChange] = useForm({
-    name: "",
-    type: 1,
-    phone: "",
-    address: "",
+const NewOrder = (props) => {
+  const [{ client, description }, handleInputChange, setValues] = useForm({
+    client: null,
+    description: "",
   });
 
+  const { saveOrder } = useAuth();
+
   const [error, setError] = useState({ error: null, type: "info" });
+  const [addClientShow, setAddClientShow] = useState(false);
+  const [showSnack, setShowSnack] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { saveClient } = useAuth();
-
-  const handleNewClient = async (event) => {
+  const handleNewOrder = async (event) => {
     event.preventDefault();
-    try {
-      setError({ ...error, error: null });
-      setLoading(true);
-      await saveClient(name, type, phone, address);
-      props.showSnack(true);
-      props.onClose();
-    } catch (err) {
+    if (client === null) {
       setError({
-        error: "Ya existe un usuario con el numero registrado!",
-        type: "error",
+        error: "Debe de seleccionar un cliente",
+        type: "warning",
       });
+    } else {
+      try {
+        setError({ ...error, error: null });
+        setLoading(true);
+        await saveOrder(client, description);
+        props.showSnack(true);
+        props.onClose();
+      } catch (err) {
+        setError({
+          error: `Hubo un error al generar la orden!!, ${err}`,
+          type: "error",
+        });
+      }
     }
     setLoading(false);
   };
@@ -71,18 +77,26 @@ const NewClient = (props) => {
             <IconButton
               color="inherit"
               edge="end"
-              onClick={() => props.onClose()}
+              onClick={() => {
+                props.onClose();
+                setValues({
+                  description: "",
+                  total: "",
+                  credit: 1,
+                  payAmount: 0,
+                });
+              }}
             >
               <Close />
             </IconButton>
           </Box>
           <Typography display="flex" alignItems="center" gap={1} variant="h5">
             <Avatar variant="rounded">
-              <PersonAddAlt1Outlined />
+              <CheckCircleOutlined />
             </Avatar>{" "}
-            Nuevo Cliente
+            Nuevo Pedido
           </Typography>
-          <Box component="form" onSubmit={handleNewClient}>
+          <Box component="form" onSubmit={handleNewOrder}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Collapse in={!!error.error} sx={{ width: "100%" }}>
@@ -108,74 +122,55 @@ const NewClient = (props) => {
                 <Divider />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  type="text"
-                  name="name"
-                  label="Nombre:"
-                  disabled={loading}
-                  fullWidth
-                  required
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Tipo:</InputLabel>
-                  <Select
-                    name="type"
-                    label="Tipo:"
-                    disabled={loading}
-                    defaultValue={1}
-                    onChange={handleInputChange}
-                  >
-                    <MenuItem value={1}>Físico</MenuItem>
-                    <MenuItem value={2}>Jurídico</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  type="tel"
-                  name="phone"
-                  label="Teléfono:"
-                  disabled={loading}
-                  inputProps={{ pattern: "[0-9]{4,}" }}
-                  fullWidth
-                  required
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <TextField
-                    type="text"
-                    name="address"
-                    label="Dirección:"
-                    disabled={loading}
-                    inputProps={{ maxLength: 120 }}
-                    multiline
-                    rows={3}
-                    required
-                    onChange={handleInputChange}
+                <FormGroup
+                  sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}
+                >
+                  <SearchBarClients
+                    onChange={(_, value) => {
+                      if (value) {
+                        setValues({ description, client: value });
+                      } else {
+                        setValues({ description, client: null });
+                      }
+                    }}
+                    sx={{ flexGrow: 1 }}
                   />
-                  <FormHelperText>Máximo 120 caracteres.</FormHelperText>
-                </FormControl>
+                  <Button
+                    variant="contained"
+                    onClick={() => setAddClientShow(true)}
+                  >
+                    <PersonAddOutlined />{" "}
+                  </Button>
+                </FormGroup>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="description"
+                  label="Información"
+                  multiline
+                  minRows={3}
+                  maxRows={6}
+                  value={description}
+                  onChange={handleInputChange}
+                />
               </Grid>
               <Grid item xs={12}>
                 <Divider />
               </Grid>
               <Grid item xs={12}>
                 <Button
+                  fullWidth
                   disabled={loading}
-                  type="submit"
                   size="large"
                   variant="contained"
                   color="success"
-                  fullWidth
+                  type="submit"
                   sx={{ py: 2 }}
                 >
                   {!loading ? (
-                    "Guardar"
+                    "Guardar pedido"
                   ) : (
                     <CircularProgress size="26px" color="inherit" />
                   )}
@@ -184,9 +179,19 @@ const NewClient = (props) => {
             </Grid>
           </Box>
         </Stack>
+        <NewClient
+          open={addClientShow}
+          onClose={() => setAddClientShow(false)}
+          showSnack={setShowSnack}
+        />
+        <Snackbar
+          open={showSnack}
+          autoHideDuration={4000}
+          onClose={() => setShowSnack(false)}
+        ></Snackbar>
       </Container>
     </Modal>
   );
 };
 
-export default NewClient;
+export default NewOrder;

@@ -1,6 +1,7 @@
 import {
   Alert,
   Badge,
+  Box,
   Button,
   CircularProgress,
   Container,
@@ -11,16 +12,15 @@ import {
   Typography,
 } from "@mui/material";
 import { PersonAddAlt1Outlined, Search } from "@mui/icons-material";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Box } from "@mui/system";
 import NewClient from "../components/clients/NewClient";
 import ClientsTable from "../components/clients/ClientsTable";
 
 const Clients = () => {
   const { onGetData } = useAuth();
   const [addClientShow, setAddClientShow] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showSnack, setShowSnack] = useState(false);
   const [clients, setClients] = useState([]);
   const [searchValue, setSearchValue] = useState("");
@@ -59,18 +59,22 @@ const Clients = () => {
             Clientes
           </Typography>
         </Badge>
-        <Stack gap={2} sx={{ textAlign: "center" }}>
-          <Button
-            size="large"
-            variant="contained"
-            color="success"
-            sx={{ py: 2 }}
-            onClick={() => setAddClientShow(true)}
+        {!loading ? (
+          <Stack
+            gap={2}
+            sx={{ textAlign: "center" }}
+            className="animate__animated animate__zoomIn animate__faster"
           >
-            <PersonAddAlt1Outlined sx={{ fontSize: "60px" }} />
-          </Button>
-          {!loading ? (
-            clients.length > 0 ? (
+            <Button
+              size="large"
+              variant="contained"
+              color="success"
+              sx={{ py: 2 }}
+              onClick={() => setAddClientShow(true)}
+            >
+              <PersonAddAlt1Outlined sx={{ fontSize: "60px" }} />
+            </Button>
+            {clients.length > 0 ? (
               <Box>
                 <TextField
                   size="small"
@@ -90,13 +94,13 @@ const Clients = () => {
               <Alert variant="filled" severity="warning" sx={{ py: 3 }}>
                 Aun no se han ingresado clientes.
               </Alert>
-            )
-          ) : (
-            <Box>
-              <CircularProgress size="50px" color="inherit" />
-            </Box>
-          )}
-        </Stack>
+            )}
+          </Stack>
+        ) : (
+          <Box height="50vh" sx={{ display: "grid", placeContent: "center" }}>
+            <CircularProgress size="50px" color="inherit" />
+          </Box>
+        )}
       </Container>
       <NewClient
         open={addClientShow}

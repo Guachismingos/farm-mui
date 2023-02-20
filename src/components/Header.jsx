@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const { currentUser, logOut } = useAuth();
-  const [error, setError] = useState({ error: "", type: "" });
+  const [setError] = useState({ error: null, type: "info" });
   const [anchorEl, setAnchorEl] = useState(false);
 
   const navigate = useNavigate();
@@ -33,12 +33,11 @@ const Header = () => {
   const theme = useTheme();
 
   const handleLogOut = async () => {
-    setError("");
+    setError({ error: null, type: "info" });
     try {
       await logOut();
     } catch (err) {
-      setError(err.code);
-      console.log(error);
+      setError({ error: err, type: "error" });
     }
   };
 
@@ -61,13 +60,12 @@ const Header = () => {
             <ArrowBack />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1, ml: 1 }}>
-            Farm-Dev
+            Granja Alfonso Chaves
           </Typography>
           <IconButton color="inherit" edge="end" onClick={handleOpenMenu}>
             <SettingsOutlined />
           </IconButton>
           <Menu
-            id="menu-appbar"
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleCloseMenu}

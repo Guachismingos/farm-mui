@@ -10,7 +10,9 @@ import {
   ShoppingCartOutlined,
   EggOutlined,
   GroupOutlined,
-  ReceiptLongOutlined,
+  SsidChartOutlined,
+  MoneyOffCsredOutlined,
+  BookmarkBorderOutlined,
 } from "@mui/icons-material/";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@emotion/react";
@@ -18,7 +20,7 @@ import { useTheme } from "@emotion/react";
 const CardButton = ({ title, color, Icon, to }) => {
   const navigate = useNavigate();
   return (
-    <Grid item xs={12} sm={6}>
+    <Grid item xs={12} sm={5} md={3}>
       <CardActionArea>
         <Card
           sx={{
@@ -57,13 +59,19 @@ const Panel = () => {
     >
       <Container
         className="animate__animated animate__zoomIn animate__faster"
-        maxWidth="sm"
+        maxWidth="lg"
         sx={{ textAlign: "center" }}
       >
         <Typography variant="h4" sx={{ mb: "40px" }}>
           Panel de Control
         </Typography>
-        <Grid sx={{ pb: 10 }} container spacing={3}>
+        <Grid container gap={3} sx={{ pb: 25, placeContent: "center" }}>
+          <CardButton
+            title="Pedidos"
+            color={palette.success.light}
+            Icon={BookmarkBorderOutlined}
+            to="/orders"
+          />
           <CardButton
             title="Ventas"
             color={palette.primary.main}
@@ -71,10 +79,16 @@ const Panel = () => {
             to="/sales"
           />
           <CardButton
-            title="Cuentas"
-            color={palette.success.main}
-            Icon={ReceiptLongOutlined}
+            title="Gastos"
+            color={palette.error.light}
+            Icon={MoneyOffCsredOutlined}
             to="/billing"
+          />
+          <CardButton
+            title="Contabilidad"
+            color={palette.warning.light}
+            Icon={SsidChartOutlined}
+            to="/accounting"
           />
           <CardButton
             title="Productos"

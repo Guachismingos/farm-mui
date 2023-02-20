@@ -6,8 +6,12 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
+  query,
   setDoc,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 
 const AuthContex = createContext();
@@ -53,19 +57,44 @@ export const AuthProvider = ({ children }) => {
     products,
     total,
     credit,
+    done,
+    paid,
     payAmount,
+    date,
+    month,
+    year,
     payArray
   ) => {
-    const timeElapsed = Date.now();
-    const today = new Date(timeElapsed);
-    setDoc(doc(collection(db, "sales")), {
+    const refDoc = doc(collection(db, "sales"));
+
+    setDoc(refDoc, {
       clientData,
       products,
       total,
       credit,
+      done,
+      paid,
       payAmount,
-      date: today.toLocaleDateString("es-CR"),
+      date,
+      month,
+      year,
       payArray,
+    });
+
+    return refDoc.id;
+  };
+
+  const updateSale = (id, payAmount, payArray, paid) => {
+    updateDoc(doc(db, "sales", id), {
+      payAmount,
+      payArray,
+      paid,
+    });
+  };
+
+  const setSaleDone = (id, done) => {
+    updateDoc(doc(db, "sales", id), {
+      done,
     });
   };
 
@@ -87,6 +116,147 @@ export const AuthProvider = ({ children }) => {
   const getProductbyId = (idRef) => getDoc(doc(db, "products", idRef));
 
   const deleteProductById = (idRef) => deleteDoc(doc(db, "products", idRef));
+
+  const saveBill = (
+    description,
+    total,
+    credit,
+    paid,
+    payAmount,
+    payArray,
+    date,
+    month,
+    year
+  ) =>
+    setDoc(doc(collection(db, "bills")), {
+      description,
+      total,
+      credit,
+      paid,
+      payAmount,
+      payArray,
+      date,
+      month,
+      year,
+    });
+
+  const updateBill = (id, payAmount, payArray, paid) => {
+    updateDoc(doc(db, "bills", id), {
+      payAmount,
+      payArray,
+      paid,
+    });
+  };
+
+  const getBillById = (idRef) => getDoc(doc(db, "bills", idRef));
+
+  //Accounting CRUD QUERIES
+
+  const getPaidOrNotQuery = (value) => {
+    const dataRef = collection(db, "sales");
+    const q = query(dataRef, where("paid", "==", value));
+    return getDocs(q);
+  };
+
+  const getBillsPaidOrNotQuery = (value) => {
+    const dataRef = collection(db, "bills");
+    const q = query(dataRef, where("paid", "==", value));
+    return getDocs(q);
+  };
+
+  const getSalesByDateQuery = (dateValue) => {
+    const dataRef = collection(db, "sales");
+    const q = query(
+      dataRef,
+      where("date", "==", dateValue.toDateString())
+    );
+    return getDocs(q);
+  };
+
+  const getIncomeDataDaily = (dateValue) => {
+    const dataRef = collection(db, "sales");
+    const q = query(dataRef, where("date", "==", dateValue.toDateString()));
+    return getDocs(q);
+  };
+
+  const getIncomeDataMonthly = (dateValue) => {
+    const dataRef = collection(db, "sales");
+    const q = query(
+      dataRef,
+      where("month", "==", dateValue.getMonth()),
+      where("year", "==", dateValue.getFullYear())
+    );
+    return getDocs(q);
+  };
+
+  const getIncomeDataYearly = (dateValue) => {
+    const dataRef = collection(db, "sales");
+    const q = query(dataRef, where("year", "==", dateValue.getFullYear()));
+    return getDocs(q);
+  };
+
+  const getOutComeDataDaily = (dateValue) => {
+    const dataRef = collection(db, "bills");
+    const q = query(dataRef, where("date", "==", dateValue.toDateString()));
+    return getDocs(q);
+  };
+
+  const getOutcomeDataMonthly = (dateValue) => {
+    const dataRef = collection(db, "bills");
+    const q = query(
+      dataRef,
+      where("month", "==", dateValue.getMonth()),
+      where("year", "==", dateValue.getFullYear())
+    );
+    return getDocs(q);
+  };
+
+  const getOutcomeDataYearly = (dateValue) => {
+    const dataRef = collection(db, "bills");
+    const q = query(dataRef, where("year", "==", dateValue.getFullYear()));
+    return getDocs(q);
+  };
+
+  const saveRecovery = (saleId, name, payAmount, date, month, year, type) =>
+    setDoc(doc(collection(db, "recoveries")), {
+      saleId,
+      name,
+      payAmount,
+      date,
+      month,
+      year,
+      type
+    });
+
+  const getRecoveryDataDaily = (dateValue) => {
+    const dataRef = collection(db, "recoveries");
+    const q = query(dataRef, where("date", "==", dateValue.toDateString()));
+    return getDocs(q);
+  };
+
+  const getRecoveryDataMonthly = (dateValue) => {
+    const dataRef = collection(db, "recoveries");
+    const q = query(
+      dataRef,
+      where("month", "==", dateValue.getMonth()),
+      where("year", "==", dateValue.getFullYear())
+    );
+    return getDocs(q);
+  };
+
+  const getRecoveryDataYearly = (dateValue) => {
+    const dataRef = collection(db, "recoveries");
+    const q = query(dataRef, where("year", "==", dateValue.getFullYear()));
+    return getDocs(q);
+  };
+
+  const saveOrder = (client, description) =>
+    setDoc(doc(collection(db, "orders")), {
+      client,
+      description,
+    });
+
+  const deleteOrder = (idRef) => deleteDoc(doc(db, "orders", idRef));
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -111,6 +281,26 @@ export const AuthProvider = ({ children }) => {
     deleteProductById,
     saveSale,
     getSaleById,
+    saveBill,
+    updateSale,
+    getBillById,
+    updateBill,
+    getPaidOrNotQuery,
+    getSalesByDateQuery,
+    getIncomeDataDaily,
+    getIncomeDataMonthly,
+    getIncomeDataYearly,
+    getOutComeDataDaily,
+    getOutcomeDataMonthly,
+    getOutcomeDataYearly,
+    getBillsPaidOrNotQuery,
+    setSaleDone,
+    saveRecovery,
+    getRecoveryDataDaily,
+    getRecoveryDataMonthly,
+    getRecoveryDataYearly,
+    saveOrder,
+    deleteOrder,
   };
 
   return (
